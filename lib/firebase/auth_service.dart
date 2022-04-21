@@ -7,7 +7,7 @@ class AuthService {
 
   AuthService(this._firebaseAuth);
 
-  Stream<User?> get authStateChenges => _firebaseAuth.authStateChanges();
+  Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
   String? get errorMessage => _firebaseAuthError;
 
   Future<bool> signInEmailAndPassword(

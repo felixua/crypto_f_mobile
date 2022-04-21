@@ -58,7 +58,7 @@ class _AuthFormState extends State<AuthForm> {
                                 ),
                                 onChanged: (value) => context
                                     .read<LoginCubit>()
-                                    .passwordChanged(value)),
+                                    .emailChanged(value)),
                             TextFormField(
                               key: const ValueKey('password'),
                               validator: (value) {

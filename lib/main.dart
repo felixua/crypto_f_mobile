@@ -73,11 +73,12 @@ class AuthenticationWrapper extends StatelessWidget {
   const AuthenticationWrapper({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final firebaseUser = context.watch<User?>();
-
-    if (firebaseUser != null) {
-      return const MyHomePage(title: 'Flutter Demo Home Page');
-    }
-    return const AuthScreen();
+    return BlocBuilder<LoginCubit, LoginCubitState>(builder: ((context, state) {
+      if (state.isAuthenticated == true) {
+        return const MyHomePage(title: 'Flutter Demo Home Page');
+      } else {
+        return const AuthScreen();
+      }
+    }));
   }
 }

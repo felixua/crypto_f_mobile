@@ -1,7 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:crypto_f_mobile/firebase/auth_service.dart';
 import 'package:equatable/equatable.dart';
-import 'package:meta/meta.dart';
 
 part 'login_cubit_state.dart';
 
@@ -25,24 +24,30 @@ class LoginCubit extends Cubit<LoginCubitState> {
     );
   }
 
-  Future<void> logInWithCredentials() async {
+  void logInWithCredentials() {
     try {
-      await _authService.signInEmailAndPassword(
-          email: state.email, password: state.password);
-      emit(state.copyWith(isAuthenticated: true, errorMessage: ""));
+      _authService
+          .signInEmailAndPassword(email: state.email, password: state.password)
+          .whenComplete(() =>
+              emit(state.copyWith(isAuthenticated: true, errorMessage: "")));
     } catch (_) {
       emit(state.copyWith(
           isAuthenticated: false, errorMessage: _authService.errorMessage));
     }
   }
 
-  Future<void> logInWithGoogle() async {
+  void logInWithGoogle() {
     try {
-      await _authService.signInWithGoogle();
-      emit(state.copyWith(isAuthenticated: true, errorMessage: ""));
+      _authService.signInWithGoogle().whenComplete(
+          () => emit(state.copyWith(isAuthenticated: true, errorMessage: "")));
     } catch (_) {
       emit(state.copyWith(
           isAuthenticated: false, errorMessage: _authService.errorMessage));
     }
+  }
+
+  void signOut() {
+    _authService.signOut().whenComplete(
+        () => emit(state.copyWith(isAuthenticated: false, errorMessage: "")));
   }
 }
