@@ -10,40 +10,96 @@ class LoginCubit extends Cubit<LoginCubitState> {
 
   void emailChanged(String value) {
     emit(
-      state.copyWith(
-        email: value.toString().trim(),
-      ),
+      state.copyWith(email: value.toString().trim(), errorMessage: ""),
     );
   }
 
   void passwordChanged(String value) {
     emit(
-      state.copyWith(
-        password: value.toString().trim(),
-      ),
+      state.copyWith(password: value.toString().trim(), errorMessage: ""),
     );
   }
 
-  void logInWithCredentials() {
-    try {
+  void password2Changed(String value) {
+    emit(
+      state.copyWith(password2: value.toString().trim(), errorMessage: ""),
+    );
+  }
+
+  void signUp() {
+    if (state.password == state.password2) {
       _authService
-          .signInEmailAndPassword(email: state.email, password: state.password)
-          .whenComplete(() =>
-              emit(state.copyWith(isAuthenticated: true, errorMessage: "")));
-    } catch (_) {
+          .signUp(email: state.email, password: state.password)
+          .then((res) {
+        if (res) {
+          emit(state.copyWith(
+              isAuthenticated: false,
+              errorMessage: "User ${state.email} created successfuly"));
+
+          _authService
+              .signInEmailAndPassword(
+                  email: state.email, password: state.password)
+              .then((res) => {
+                    if (res)
+                      emit(state.copyWith(
+                          isAuthenticated: true, errorMessage: ""))
+                    else
+                      emit(state.copyWith(
+                          isAuthenticated: false,
+                          errorMessage: _authService.errorMessage))
+                  })
+              .catchError((_) {
+            emit(state.copyWith(
+                isAuthenticated: false,
+                errorMessage: _authService.errorMessage));
+          });
+        } else {
+          emit(state.copyWith(
+              isAuthenticated: false, errorMessage: _authService.errorMessage));
+        }
+      }).catchError((_) {
+        emit(state.copyWith(
+            isAuthenticated: false, errorMessage: _authService.errorMessage));
+      });
+    } else {
       emit(state.copyWith(
-          isAuthenticated: false, errorMessage: _authService.errorMessage));
+          isAuthenticated: false,
+          errorMessage: "Password confirmation doesn't match"));
     }
   }
 
-  void logInWithGoogle() {
-    try {
-      _authService.signInWithGoogle().whenComplete(
-          () => emit(state.copyWith(isAuthenticated: true, errorMessage: "")));
-    } catch (_) {
+  void logInWithCredentials() {
+    _authService
+        .signInEmailAndPassword(email: state.email, password: state.password)
+        .then((res) => {
+              if (res)
+                emit(state.copyWith(isAuthenticated: true, errorMessage: ""))
+              else
+                emit(state.copyWith(
+                    isAuthenticated: false,
+                    errorMessage: _authService.errorMessage))
+            })
+        .catchError((err) {
       emit(state.copyWith(
           isAuthenticated: false, errorMessage: _authService.errorMessage));
-    }
+    });
+  }
+
+  void logInWithGoogle() {
+    _authService
+        .signInWithGoogle()
+        .then((res) => {
+              if (res)
+                emit(state.copyWith(isAuthenticated: true, errorMessage: ""))
+              else
+                emit(state.copyWith(
+                    isAuthenticated: false,
+                    errorMessage: _authService.errorMessage))
+            })
+        .catchError((e) {
+      emit(state.copyWith(
+          isAuthenticated: false, errorMessage: _authService.errorMessage));
+    });
   }
 
   void signOut() {

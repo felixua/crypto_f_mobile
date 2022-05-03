@@ -1,16 +1,16 @@
-import 'package:crypto_f_mobile/screens/signup_screen.dart';
+import 'package:crypto_f_mobile/screens/auth_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:crypto_f_mobile/cubit/login_cubit.dart';
 
-class AuthForm extends StatefulWidget {
-  const AuthForm({Key? key}) : super(key: key);
+class SignupForm extends StatefulWidget {
+  const SignupForm({Key? key}) : super(key: key);
 
   @override
-  State<AuthForm> createState() => _AuthFormState();
+  State<SignupForm> createState() => _AuthFormState();
 }
 
-class _AuthFormState extends State<AuthForm> {
+class _AuthFormState extends State<SignupForm> {
   final _formKey = GlobalKey<FormState>();
   bool _userRemember = false;
 
@@ -18,14 +18,18 @@ class _AuthFormState extends State<AuthForm> {
   Widget build(BuildContext context) {
     return BlocListener<LoginCubit, LoginCubitState>(
         listener: (context, state) {
-          if (state.errorMessage.isNotEmpty) {
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(
-                  content: Text(state.errorMessage),
-                ),
-              );
+          if (!state.isAuthenticated) {
+            if (state.errorMessage.isNotEmpty) {
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  SnackBar(
+                    content: Text(state.errorMessage),
+                  ),
+                );
+            }
+          } else {
+            Navigator.of(context).pop();
           }
         },
         child: Center(
@@ -74,24 +78,21 @@ class _AuthFormState extends State<AuthForm> {
                                   .read<LoginCubit>()
                                   .passwordChanged(value),
                             ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Checkbox(
-                                        checkColor: Colors.white,
-                                        value: _userRemember,
-                                        onChanged: (bool? value) {
-                                          setState(() {
-                                            _userRemember = value!;
-                                          });
-                                        }),
-                                    const Expanded(
-                                      child: Text('Remember me'),
-                                    ),
-                                  ]),
+                            TextFormField(
+                              key: const ValueKey('password2'),
+                              validator: (value) {
+                                if (value != null &&
+                                    (value.isEmpty || value.length < 7)) {
+                                  return 'Password must be at least 7 characters long.';
+                                }
+                                return null;
+                              },
+                              decoration: const InputDecoration(
+                                  labelText: 'Repeat password'),
+                              obscureText: true,
+                              onChanged: (value) => context
+                                  .read<LoginCubit>()
+                                  .password2Changed(value),
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -99,38 +100,20 @@ class _AuthFormState extends State<AuthForm> {
                                 Padding(
                                   padding: const EdgeInsets.all(5.0),
                                   child: ElevatedButton(
-                                    onPressed: () => context
-                                        .read<LoginCubit>()
-                                        .logInWithCredentials(),
-                                    child: const Text('Sign in'),
+                                    onPressed: () =>
+                                        context.read<LoginCubit>().signUp(),
+                                    child: const Text('Sign up'),
                                   ),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.all(5.0),
                                   child: ElevatedButton(
-                                    onPressed: () => context
-                                        .read<LoginCubit>()
-                                        .logInWithGoogle(),
-                                    child: const Text('Sign in with Google'),
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
+                                    child: const Text('Back to Sign in'),
                                   ),
                                 ),
                               ],
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 5.0),
-                              child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    const Text('You can also '),
-                                    TextButton(
-                                      onPressed: () => Navigator.of(context)
-                                          .push(MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const SignupScreen())),
-                                      child: const Text('sign up here'),
-                                    ),
-                                  ]),
                             ),
                             const SizedBox(
                               height: 5,
