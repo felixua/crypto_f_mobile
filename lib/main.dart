@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+import 'package:crypto_f_mobile/screens/transactions_screen.dart';
 import 'package:crypto_f_mobile/screens/home_page.dart';
 import 'package:crypto_f_mobile/firebase/auth_service.dart';
 import 'package:crypto_f_mobile/screens/auth_screen.dart';
@@ -61,7 +62,12 @@ class MyApp extends StatelessWidget {
           child: MaterialApp(
             title: 'Flutter Demo',
             theme: ThemeData(
+              backgroundColor: Colors.white,
               primarySwatch: Colors.blue,
+              primaryColor: Colors.blue,
+              primaryColorDark: Colors.red,
+              primaryColorLight: Colors.black,
+              secondaryHeaderColor: Colors.black,
             ),
             home: const AuthenticationWrapper(),
           ),
@@ -75,7 +81,7 @@ class AuthenticationWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<LoginCubit, LoginCubitState>(builder: ((context, state) {
       if (state.isAuthenticated == true) {
-        return const MyHomePage(title: 'Flutter Demo Home Page');
+        return const TransactionsPage(title: 'Bitcoin (BTC)');
       } else {
         return const AuthScreen();
       }
