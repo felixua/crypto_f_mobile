@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:crypto_f_mobile/models/coin.dart';
+
+import 'package:crypto_f_mobile/cubit/login_cubit.dart';
+import 'package:crypto_f_mobile/cubit/coin_cubit.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({Key? key}) : super(key: key);
@@ -54,41 +60,53 @@ class MainDrawer extends StatelessWidget {
             ),
           ),
         ),
-        buildListTile(context, "Bitcoin", "BTC", () {
-          print("test");
-        }),
-        buildListTile(context, "Ethereum", "ETH", () {}),
+        Column(
+            children: context
+                .read<CoinCubit>()
+                .state
+                .coinList
+                .map((coin) =>
+                    buildListTile(context, coin.displayName, coin.coin, () {}))
+                .toList()),
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Row(
-            children: [
-              TextButton.icon(
-                style: TextButton.styleFrom(
-                    minimumSize: const Size(30, 30),
-                    padding: const EdgeInsets.all(0.0),
-                    alignment: Alignment.center),
-                icon: const Icon(
-                  Icons.add,
-                  size: 18,
-                ),
-                label: const Text(""),
-                onPressed: () {},
-              ),
-              TextButton.icon(
-                style: TextButton.styleFrom(
-                  minimumSize: const Size(30, 30),
-                  padding: const EdgeInsets.all(2.0),
-                  alignment: Alignment.center,
-                ),
-                icon: const Icon(
-                  Icons.remove,
-                  size: 18,
-                ),
-                label: const Text(""),
-                onPressed: () {},
-              ),
-            ],
+          child: TextButton(
+            child: const Text(
+              "Edit coin list",
+              style: TextStyle(color: Colors.blue),
+            ),
+            style: TextButton.styleFrom(alignment: Alignment.center),
+            onPressed: () => Navigator.of(context).pushNamed('/coinlist'),
           ),
+          // child: Row(
+          //   children: [
+          //     TextButton.icon(
+          //       style: TextButton.styleFrom(
+          //           minimumSize: const Size(30, 30),
+          //           padding: const EdgeInsets.all(0.0),
+          //           alignment: Alignment.center),
+          //       icon: const Icon(
+          //         Icons.add,
+          //         size: 18,
+          //       ),
+          //       label: const Text(""),
+          //       onPressed: () {},
+          //     ),
+          //     TextButton.icon(
+          //       style: TextButton.styleFrom(
+          //         minimumSize: const Size(30, 30),
+          //         padding: const EdgeInsets.all(2.0),
+          //         alignment: Alignment.center,
+          //       ),
+          //       icon: const Icon(
+          //         Icons.remove,
+          //         size: 18,
+          //       ),
+          //       label: const Text(""),
+          //       onPressed: () {},
+          //     ),
+          //   ],
+          // ),
         ),
         const Divider(height: 10.0, color: Colors.grey),
         ListTile(
@@ -102,7 +120,9 @@ class MainDrawer extends StatelessWidget {
             style: TextStyle(
                 fontSize: 16, color: Theme.of(context).primaryColorLight),
           ),
-          onTap: () {},
+          onTap: () {
+            context.read<LoginCubit>().signOut();
+          },
         ),
       ]),
     );

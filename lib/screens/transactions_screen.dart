@@ -1,3 +1,4 @@
+import 'package:crypto_f_mobile/cubit/coin_cubit.dart';
 import 'package:crypto_f_mobile/widgets/drawer/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -45,8 +46,15 @@ class TransactionsPage extends StatefulWidget {
 class _TransactionsPageState extends State<TransactionsPage> {
   @override
   Widget build(BuildContext context) {
-    return BlocListener<LoginCubit, LoginCubitState>(
-      listener: (context, state) {},
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<LoginCubit, LoginCubitState>(
+          listener: (context, state) => {},
+        ),
+        BlocListener<CoinCubit, CoinCubitState>(
+          listener: (context, state) {},
+        ),
+      ],
       child: Scaffold(
         appBar: AppBar(
           title: Text(widget.title),

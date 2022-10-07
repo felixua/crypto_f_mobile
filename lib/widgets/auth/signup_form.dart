@@ -1,7 +1,7 @@
-import 'package:crypto_f_mobile/screens/auth_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:crypto_f_mobile/cubit/login_cubit.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class SignupForm extends StatefulWidget {
   const SignupForm({Key? key}) : super(key: key);
@@ -43,6 +43,10 @@ class _AuthFormState extends State<SignupForm> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
+                            SvgPicture.asset(
+                                'assets/images/crypto-fucking-logo.svg',
+                                width: 72.0,
+                                height: 57.0),
                             TextFormField(
                                 key: const ValueKey('email'),
                                 autocorrect: false,

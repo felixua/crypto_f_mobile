@@ -4,13 +4,13 @@ import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-import 'package:crypto_f_mobile/screens/transactions_screen.dart';
-import 'package:crypto_f_mobile/screens/home_page.dart';
-import 'package:crypto_f_mobile/firebase/auth_service.dart';
-import 'package:crypto_f_mobile/screens/auth_screen.dart';
-import 'package:crypto_f_mobile/app_bloc_observer.dart';
+import 'package:crypto_f_mobile/router/app_router.dart';
 
 import 'package:crypto_f_mobile/cubit/login_cubit.dart';
+import 'package:crypto_f_mobile/cubit/coin_cubit.dart';
+
+import 'package:crypto_f_mobile/firebase/auth_service.dart';
+import 'package:crypto_f_mobile/app_bloc_observer.dart';
 
 void main() async {
   BlocOverrides.runZoned(
@@ -33,6 +33,7 @@ void main() async {
       }
 
       runApp(MyApp(
+        appRouter: AppRouter(),
         authenticationRepository: AuthService(FirebaseAuth.instance),
       ));
     },
@@ -41,50 +42,43 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({
-    Key? key,
-    required AuthService authenticationRepository,
-  })  : _authenticationRepository = authenticationRepository,
+  const MyApp(
+      {Key? key,
+      required AuthService authenticationRepository,
+      required AppRouter appRouter})
+      : _authenticationRepository = authenticationRepository,
+        _appRouter = appRouter,
         super(key: key);
-
+  final AppRouter _appRouter;
   final AuthService _authenticationRepository;
 
   @override
   Widget build(BuildContext context) {
     return RepositoryProvider.value(
-        value: _authenticationRepository,
-        child: MultiBlocProvider(
-          providers: [
-            BlocProvider<LoginCubit>(
-              create: (context) => LoginCubit(_authenticationRepository),
-            ),
-          ],
-          child: MaterialApp(
-            title: 'Flutter Demo',
-            theme: ThemeData(
-              backgroundColor: Colors.white,
-              primarySwatch: Colors.blue,
-              primaryColor: Colors.blue,
-              primaryColorDark: Colors.red,
-              primaryColorLight: Colors.black,
-              secondaryHeaderColor: Colors.black,
-            ),
-            home: const AuthenticationWrapper(),
+      value: _authenticationRepository,
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<LoginCubit>(
+            create: (context) => LoginCubit(_authenticationRepository),
           ),
-        ));
-  }
-}
-
-class AuthenticationWrapper extends StatelessWidget {
-  const AuthenticationWrapper({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<LoginCubit, LoginCubitState>(builder: ((context, state) {
-      if (state.isAuthenticated == true) {
-        return const TransactionsPage(title: 'Bitcoin (BTC)');
-      } else {
-        return const AuthScreen();
-      }
-    }));
+          BlocProvider<CoinCubit>(
+            create: (context) =>
+                CoinCubit(loginState: context.read<LoginCubit>().state),
+          ),
+        ],
+        child: MaterialApp(
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            backgroundColor: Colors.white,
+            primarySwatch: Colors.blue,
+            primaryColor: Colors.blue,
+            primaryColorDark: Colors.red,
+            primaryColorLight: Colors.black,
+            secondaryHeaderColor: Colors.black,
+          ),
+          onGenerateRoute: _appRouter.onGenerateRoute,
+        ),
+      ),
+    );
   }
 }
