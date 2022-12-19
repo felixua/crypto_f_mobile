@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:crypto_f_mobile/models/coin.dart';
-
 import 'package:crypto_f_mobile/cubit/login_cubit.dart';
 import 'package:crypto_f_mobile/cubit/coin_cubit.dart';
 
@@ -60,14 +58,18 @@ class MainDrawer extends StatelessWidget {
             ),
           ),
         ),
-        Column(
-            children: context
-                .read<CoinCubit>()
-                .state
-                .coinList
-                .map((coin) =>
-                    buildListTile(context, coin.displayName, coin.coin, () {}))
-                .toList()),
+        BlocBuilder<CoinCubit, CoinCubitState>(
+          builder: (context, state) {
+            return Column(
+                children: context
+                    .read<CoinCubit>()
+                    .state
+                    .coinList
+                    .map((coin) => buildListTile(
+                        context, coin.displayName, coin.coin, () {}))
+                    .toList());
+          },
+        ),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: TextButton(

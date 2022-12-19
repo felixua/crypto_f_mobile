@@ -4,13 +4,15 @@ import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto_f_mobile/cubit/login_cubit.dart';
 import 'package:crypto_f_mobile/models/coin.dart';
+import 'package:crypto_f_mobile/widgets/coins/coinlist.dart';
 import 'package:equatable/equatable.dart';
 
 part 'coin_cubit_state.dart';
 
 class CoinCubit extends Cubit<CoinCubitState> {
   final LoginCubitState loginState;
-  CoinCubit({required this.loginState}) : super(const CoinCubitState([])) {
+  CoinCubit({required this.loginState})
+      : super(const CoinCubitState(coins: [])) {
     _monitorCoinList();
   }
 
@@ -26,7 +28,7 @@ class CoinCubit extends Cubit<CoinCubitState> {
 
   StreamSubscription<List<Coin>> _monitorCoinList() {
     return coinListSubscription = coins.listen((coinList) {
-      emit(CoinCubitState(coinList));
+      emit(CoinCubitState(coins: coinList));
     });
   }
 
@@ -39,6 +41,26 @@ class CoinCubit extends Cubit<CoinCubitState> {
           selected: false));
     });
     return coinList;
+  }
+
+  void addCoin(String coin, String displayName) {
+    final Map<String, dynamic> newCoin = {
+      'coin': coin,
+      'displayName': displayName,
+      'user': loginState.email
+    };
+
+    coinsCollection
+        .add(newCoin)
+        .then((_) => emit(CoinCubitState(coins: state.coinList)));
+  }
+
+  void deleteCoin(String coin) {
+    coinsCollection
+        .where("user", isEqualTo: loginState.email)
+        .where("coin", isEqualTo: coin)
+        .get()
+        .then((snapshot) => snapshot.docs[0].reference.delete());
   }
 
   @override

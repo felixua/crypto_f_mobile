@@ -37,7 +37,7 @@ void main() async {
         authenticationRepository: AuthService(FirebaseAuth.instance),
       ));
     },
-    blocObserver: AppBlocObserver(),
+    //blocObserver: AppBlocObserver(),
   );
 }
 

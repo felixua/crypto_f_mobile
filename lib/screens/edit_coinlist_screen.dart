@@ -9,27 +9,31 @@ class EditCoinListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final coins = context.read<CoinCubit>();
+    //final coins = context.read<CoinCubit>();
 
-    return BlocListener<CoinCubit, CoinCubitState>(
-      listener: (context, state) {},
-      child: Scaffold(
-        appBar: AppBar(),
-        body: Column(
-          children: [
-            CoinList(coins: coins.state.coinList),
-            Center(
-              child: TextButton.icon(
-                icon: const Icon(
-                  Icons.add,
-                  size: 30,
-                ),
-                label: const Text("Add new coin"),
-                onPressed: () {},
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Edit coin list"),
+      ),
+      body: Column(
+        children: [
+          BlocBuilder<CoinCubit, CoinCubitState>(
+            builder: (context, state) {
+              //print('New state: ${state.coinList.length} coins');
+              return CoinList(coins: context.read<CoinCubit>().state.coinList);
+            },
+          ),
+          Center(
+            child: TextButton.icon(
+              icon: const Icon(
+                Icons.add,
+                size: 30,
               ),
+              label: const Text("Add new coin"),
+              onPressed: () => Navigator.of(context).pushNamed('/addNewCoin'),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
